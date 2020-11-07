@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Bouldering name generator</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Roboto&display=swap" rel="stylesheet">
+
+        <style>
+            :root {
+                --palette-background: #EDF6F9;
+                --palette-text: #006D77;
+                --palette-highlight: #fdfdfd;
+                --palette-title: #E29578;
+            }
+
+            body, html {
+                margin: 0;
+                padding: 0;
+
+                height: 100%;
+                width: 100%;
+
+                background-color: var(--palette-background);
+                color: var(--palette-text);
+
+                font-size: 1.25rem;
+                font-family: 'Roboto', sans-serif;
+
+                overflow: hidden;
+            }
+
+            .container {
+                margin: 0 auto;
+
+                height: 100%;
+                width: 100vw;
+                max-width: 50rem;
+
+                text-align: center;
+                position: relative;
+            }
+
+            .inner {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2.5em;
+                color: var(--palette-title);
+                font-family: 'Bree Serif', 'Roboto', sans-serif;
+            }
+
+            h2 {
+                font-size: 2em;
+                text-transform: capitalize;
+            }
+
+            input {
+                border: none;
+                outline: none;
+                padding: 1.25rem;
+                font-size: 1.25rem;
+                border-radius: 5rem;
+                text-align: center;
+                background-color: var(--palette-highlight);
+            }
+
+            button {
+                cursor: pointer;
+                display: block;
+                margin: 2em auto;
+                border: none;
+                padding: 1em;
+                font-size: 0.75rem;
+                border-radius: 5rem;
+                background-color: var(--palette-text);
+                color: var(--palette-background);
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+
+            <div class="inner">
+
+                <h1>Bouldering name generator</h1>
+                <form id="nameform">
+                    <input type="text" name="name" placeholder="Enter your name" />
+                    <button id="submit" type="submit">Generate your name</button>
+                </form>
+
+                <div id="content">
+                    <h2 id="output">No name yet</h2>
+                    <div id="definition"><div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <script type="text/javascript">
+
+            const form = document.getElementById('nameform');
+            const submitButton = document.getElementById('submit');
+            const nameInput = document.querySelector('[name="name"]');
+            const nameOutput = document.getElementById('output');
+            const definition = document.getElementById('definition');
+
+            form.addEventListener('submit', (event) => void event.preventDefault());
+
+            submitButton.addEventListener('click', () => {
+
+                fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        // "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: JSON.stringify({ name: nameInput.value })
+                }).then(async (response) => {
+
+                    // await the json data
+                    const data = await response.json();
+
+                    // update the output name
+                    nameOutput.textContent = data.name;
+
+                    // add the definition
+                    definition.textContent = data.definition.join('\n');
+                });
+            });
+        </script>
+    </body>
+</html>
