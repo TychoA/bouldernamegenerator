@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from os import path
 from random import uniform
+from math import floor
 
 def get_term(name):
 
@@ -27,7 +28,7 @@ def get_term(name):
         matches = [term for term in terms if len(term) and term[0] == first_letter]
 
         # now, get a random match
-        index = round(uniform(0, len(matches)))
+        index = floor(uniform(0, len(matches)))
         match = matches[index]
 
         # output the random name

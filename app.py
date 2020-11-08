@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from terms import get_term
-from definitions import get_definitions
 from flask import Flask, render_template, request
 from flask.json import jsonify
 app = Flask(__name__)
+
+from terms import get_term
+from definitions import get_definitions
 
 # get a static collection of all definitions
 definitions = get_definitions()
@@ -21,7 +22,7 @@ def generate():
     name = f"{term} {params['name']}"
 
     # get the definition
-    definition = definitions[term] if term in definitions else ''
+    definition = definitions[term] if term in definitions else []
 
     # expose the result
     return { 'name': name, 'definition': definition }

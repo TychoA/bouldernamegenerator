@@ -13,12 +13,10 @@ def get_definitions():
 
         # create a soup so we can parse it
         contents = f.read()
-        soup = BeautifulSoup(contents, 'html.parser')
 
         # expressions to find terms and definitions
-        term_re = r'\<strong\>([\w\s]+)\<\/strong\>'
-        dfn_re = r'\<\/strong\>([\w\s\.]+)\<br\>'
         both_re = r'\<strong\>([\w\s]+)\<\/strong\>([\w\s\.\/]+)\<'
+        both_re = r'\<strong\>([\w\s]+)\<\/strong\>([\w\s\.\/\(\)\-\"\,\“\”]+)\<'
 
         # write all definitions to the file
         matches = re.findall(both_re, contents, re.MULTILINE)
@@ -29,7 +27,7 @@ def get_definitions():
 
         # iterate over the matches
         for (term, dfn) in matches:
-            term = term.lower()
+            term = term.lower().strip()
             if term not in definitions:
                 definitions[term] = []
 
@@ -51,7 +49,8 @@ def get_definitions():
             # add a new term
             if tag.name == 'dfn':
                 latest_dfn = tag.get_text().lower().strip()
-                definitions[latest_dfn] = []
+                if latest_dfn not in definitions:
+                    definitions[latest_dfn] = []
 
             # add a definition to the term
             if tag.name == 'dd':
