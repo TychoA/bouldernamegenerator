@@ -60,5 +60,20 @@ def get_definitions():
     return definitions
 
 if __name__ == "__main__":
+    output_file = 'definitions.tsv'
     result = get_definitions()
-    print(result)
+
+    # clear the file before writing to it
+    if path.isfile(output_file):
+        open(output_file, 'w').write('')
+
+    # open the file for appending the definitions
+    with open(output_file, 'a') as csv:
+
+        # write the columns
+        csv.write('term\tdefinition\n')
+
+        # and all the data
+        for key in result.keys():
+            value = ''.join(result[key]).strip()
+            csv.write(f'{key}\t{value}\n')
