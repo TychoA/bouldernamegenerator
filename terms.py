@@ -2,11 +2,15 @@
 from os import path
 from random import uniform
 from math import floor
+import sys
 
 def get_term(name):
 
     # the file that holds the terms
-    input_file = 'terms.txt'
+    if getattr(sys, 'frozen', False):
+        input_file = path.join(sys._MEIPASS, 'terms.txt')
+    else:
+        input_file = 'terms.txt'
 
     # we need it
     if not path.isfile(input_file):

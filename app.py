@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import os, sys
 from flask import Flask, render_template, request
 from flask.json import jsonify
-app = Flask(__name__)
-
 from terms import get_term
 from definitions import get_definitions
+
+# create the app
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    app = Flask(__name__, template_folder=template_folder)
+else:
+    app = Flask(__name__)
 
 # get a static collection of all definitions
 definitions = get_definitions()
@@ -26,3 +32,5 @@ def generate():
 
     # expose the result
     return { 'name': name, 'definition': definition }
+
+app.run()

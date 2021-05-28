@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 from bs4 import BeautifulSoup
+import sys
 from os import path
 import re
+import csv
+from collections import defaultdict
 
 def get_definitions():
 
+    if getattr(sys, 'frozen', False):
+        inputfile = path.join(sys._MEIPASS, 'definitions.tsv')
+    else:
+        inputfile = 'definitions.tsv'
+
+    # check if the file exists
+    if not path.isfile(inputfile):
+        return {}
+
+    # read the file and expose the collection
+    with open(inputfile, 'r') as tsvfile:
+        return {row['term']: row['definition'] for row in csv.DictReader(tsvfile, dialect='excel-tab')}
+
+def _create_definitions():
+
     # collection of definitions per term
-    definitions = {}
+    definitions = defaultdict(list)
 
     # open the bouldering terms file
     with open("sources/terms.html") as f:
 
-        # create a soup so we can parse it
-        contents = f.read()
-
-        # expressions to find terms and definitions
-        both_re = r'\<strong\>([\w\s]+)\<\/strong\>([\w\s\.\/]+)\<'
-        both_re = r'\<strong\>([\w\s]+)\<\/strong\>([\w\s\.\/\(\)\-\"\,\“\”]+)\<'
-
         # write all definitions to the file
-        matches = re.findall(both_re, contents, re.MULTILINE)
+        matches = re.findall(r'\<strong\>([\w\s]+)\<\/strong\>([\w\s\.\/\(\)\-\"\,\“\”]+)\<', f.read(), re.MULTILINE)
 
         # skip if we didn't find matches
         if matches == None:
@@ -27,30 +38,22 @@ def get_definitions():
 
         # iterate over the matches
         for (term, dfn) in matches:
-            term = term.lower().strip()
-            if term not in definitions:
-                definitions[term] = []
 
             # and add the definition to the term
-            definitions[term].append(dfn)
+            definitions[term.lower().strip()].append(dfn)
 
     # open the wiki terms file
     with open("sources/wiki_terms.html") as f:
-
-        # create a soup so we can parse it
-        soup = BeautifulSoup(f.read(), 'html.parser')
 
         # the latest found term
         latest_dfn = ''
 
         # iterate over all the terms and definitions
-        for tag in soup.find_all(['dfn', 'dd']):
+        for tag in BeautifulSoup(f.read(), 'html.parser').find_all(['dfn', 'dd']):
 
             # add a new term
             if tag.name == 'dfn':
                 latest_dfn = tag.get_text().lower().strip()
-                if latest_dfn not in definitions:
-                    definitions[latest_dfn] = []
 
             # add a definition to the term
             if tag.name == 'dd':
@@ -60,8 +63,9 @@ def get_definitions():
     return definitions
 
 if __name__ == "__main__":
+
     output_file = 'definitions.tsv'
-    result = get_definitions()
+    result = _create_definitions()
 
     # clear the file before writing to it
     if path.isfile(output_file):

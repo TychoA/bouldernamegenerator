@@ -106,21 +106,24 @@
 
         <script type="text/javascript">
 
+            // get all the elements we need
             const form = document.getElementById('nameform');
             const submitButton = document.getElementById('submit');
             const nameInput = document.querySelector('[name="name"]');
             const nameOutput = document.getElementById('output');
             const definition = document.getElementById('definition');
 
+            // don't redirect to a different uri
             form.addEventListener('submit', (event) => void event.preventDefault());
 
+            // wait until the form is submitted
             submitButton.addEventListener('click', () => {
 
+                // so we can ask for a newly generated name/definition
                 fetch('/generate', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",
-                        // "Content-Type": "application/x-www-form-urlencoded",
                     },
                     body: JSON.stringify({ name: nameInput.value })
                 }).then(async (response) => {
@@ -132,7 +135,7 @@
                     nameOutput.textContent = data.name;
 
                     // add the definition
-                    definition.textContent = data.definition.join('\n');
+                    definition.textContent = data.definition;
                 });
             });
         </script>
